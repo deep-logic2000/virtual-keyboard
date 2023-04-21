@@ -1,0 +1,9 @@
+node_modules
+.idea/**/*
+*.iml
+*.xml
+.vscode/
+.DS_Store
+package-lock.json
+thumb.db
+dist
