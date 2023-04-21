@@ -1,0 +1,14 @@
+.keyboard {
+    font-size: 6px;
+    display: inline-block;
+    background: #424242;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    border: 0.063em solid #585858;
+    margin: 0 auto;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}
