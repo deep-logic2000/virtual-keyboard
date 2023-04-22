@@ -21,8 +21,14 @@ class Keyboard {
   }
 
   createButton(buttonObj) {
+    const buttonIsLarge = buttonObj.code === "Backspace" || buttonObj.code === "CapsLock" || buttonObj.code === "ShiftLeft";
+    const buttonIsMedium = buttonObj.code === "Enter" || buttonObj.code === "ShiftRight";
+    const buttonIsTab = buttonObj.code === "Tab";
     this.buttonWrapper = document.createElement("div");
     this.buttonWrapper.classList.add("key");
+    if (buttonIsLarge) this.buttonWrapper.classList.add("key-l");
+    if (buttonIsMedium) this.buttonWrapper.classList.add("key-m");
+    if (buttonIsTab) this.buttonWrapper.classList.add("key-tab");
     this.buttonWrapper.setAttribute("id", `${buttonObj.code}`);
     this.buttonWrapper.insertAdjacentHTML(
       "afterbegin",
@@ -57,17 +63,45 @@ class Keyboard {
   }
 
   render() {
+    const section = document.createElement("section");
+    section.setAttribute("id", "section-main");
+
+    const container = document.createElement("div");
+    container.classList.add("container");
+
+    const title = document.createElement("h1");
+    title.innerHTML = "Virtual Keyboard";
+    title.classList.add("title");
+
+    const textArea = document.createElement("textarea");
+    textArea.setAttribute("id", "keyboard-screen");
+    textArea.setAttribute("name", "keyboard-screen");
+    textArea.setAttribute("rows", "10");
+    textArea.setAttribute("cols", "50");
+    textArea.setAttribute("autofocus", "");
+    textArea.classList.add("text");
+
+    const keyboardWrapper = document.createElement("div");
+    keyboardWrapper.classList.add("keyboard");
+
+    container.append(title);
+    container.append(textArea);
+
     this.firstRow = this.createRow(FIRST_ROW);
     this.secondRow = this.createRow(SECOND_ROW);
     this.thirdRow = this.createRow(THIRD_ROW);
     this.fourthRow = this.createRow(FOURTH_ROW);
     this.fifthRow = this.createRow(FIFTH_ROW);
 
-    this.wrapper.append(this.firstRow);
-    this.wrapper.append(this.secondRow);
-    this.wrapper.append(this.thirdRow);
-    this.wrapper.append(this.fourthRow);
-    this.wrapper.append(this.fifthRow);
+    keyboardWrapper.append(this.firstRow);
+    keyboardWrapper.append(this.secondRow);
+    keyboardWrapper.append(this.thirdRow);
+    keyboardWrapper.append(this.fourthRow);
+    keyboardWrapper.append(this.fifthRow);
+
+    container.append(keyboardWrapper);
+    section.append(container);
+    this.wrapper.append(section);
   }
 }
 

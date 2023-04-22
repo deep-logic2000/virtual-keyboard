@@ -7,5 +7,6 @@ window.onload = function () {
   } else {
     setLocalStorage("lang", keyboard.language);
   }
+
   keyboard.render();
 };
