@@ -12,6 +12,8 @@
 .text {
   font-size: 1rem;
   color: grey;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
 }
 
 .keyboard {
@@ -26,6 +28,7 @@
   margin: 0 auto;
   width: 60%;
   box-sizing: border-box;
+  user-select: none;
 }
 
 .row {
@@ -48,21 +51,35 @@
   border-bottom-color: #555;
   font-family: monospace;
   font-size: 14px;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.key:hover {
+  cursor: pointer;
+  background-color: rgb(58, 85, 58);
+}
+
+.key:active {
+  background-color: rgb(88, 182, 88);
+}
+
+.active {
+  background-color: rgb(88, 182, 88);
 }
 
 .key-l {
-    width: 100px;
+  width: 100px;
 }
 
 .key-m {
-    width: 86px;
+  width: 86px;
 }
 
 .key-tab {
-    width: 50px;
+  width: 50px;
 }
 
 #Space {
-    width: 330px;
-    flex-grow: 1;
+  width: 330px;
+  flex-grow: 1;
 }
