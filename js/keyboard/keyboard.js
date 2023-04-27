@@ -97,7 +97,7 @@ class Keyboard {
     const key = event.code;
     if (key === "CapsLock") return;
     if (key === "ShiftLeft" || key === "ShiftRight") {
-      keyboardButton.keyShiftUp();
+      keyboardButton.keyShiftUp(this.isCapsLockPressed);
       this.isShiftPressed = false;
     }
     if (key === "AltLeft") {
@@ -139,17 +139,62 @@ class Keyboard {
   }
 
   handleKeyDown(event) {
+    const textArea = document.getElementById("keyboard-screen");
+    keyboardButton.changeColor(event);
+    event.preventDefault();
     const key = event.code;
     if (key === "ShiftLeft" || key === "ShiftRight") {
-      keyboardButton.pressShiftDown();
+      keyboardButton.pressShiftDown(this.isCapsLockPressed);
       this.isShiftPressed = true;
+      return;
+    }
+
+    if (key === "Backspace") {
+      const position = this.getCaretPosition(textArea);
+      if (position < 1) return;
+
+      textArea.value =
+        textArea.value.substr(0, position - 1) +
+        textArea.value.substr(position);
+      textArea.selectionStart = position - 1;
+      textArea.selectionEnd = position - 1;
+      textArea.focus();
+      return;
     }
 
     if (key === "Tab") {
       event.preventDefault();
+      textArea.value += "    ";
+      return;
     }
-    if (key !== "CapsLock") {
-      keyboardButton.changeColor(event);
+
+    if (key === "Delete") {
+      const position = this.getCaretPosition(textArea);
+      textArea.value =
+        textArea.value.substr(0, position) +
+        textArea.value.substr(position + 1);
+      textArea.selectionStart = position;
+      textArea.selectionEnd = position;
+      textArea.focus();
+      return;
+    }
+
+    // if (key !== "CapsLock") {
+    //   keyboardButton.changeColor(event);
+    // }
+
+    if (key === "Enter") {
+      const position = this.getCaretPosition(textArea);
+      event.preventDefault();
+      textArea.value = `${textArea.value.substring(
+        0,
+        textArea.selectionStart
+      )}\r\n${textArea.value.substring(
+        textArea.selectionEnd,
+        textArea.value.length
+      )}`;
+      textArea.selectionEnd = position + 1;
+      return;
     }
 
     if (key === "AltLeft") {
@@ -158,7 +203,6 @@ class Keyboard {
     }
 
     if (key === "ControlLeft") {
-      event.preventDefault();
       this.isControlPressed = true;
     }
 
@@ -167,9 +211,18 @@ class Keyboard {
       (key === "AltLeft" && this.isControlPressed)
     ) {
       this.changeLanguage();
-      // return;
+      return;
     }
     // console.log(key);
+
+    if (key === "CapsLock") {
+      keyboardButton.pressCapsLockDown(
+        this.isCapsLockPressed,
+        this.isShiftPressed,
+      );
+      this.isCapsLockPressed = !this.isCapsLockPressed;
+      return;
+    }
 
     // if (key === "CapsLock" && !event.repeat) {
     //   const lowerCaseLetters = Array.from(
@@ -197,6 +250,12 @@ class Keyboard {
     //     upperCaseLetters.forEach((elem) => elem.setAttribute("hidden", "true"));
     //   }
     // }
+    if (key !== "ControlLeft" && key !== "AltLeft") {
+      const letter = document.getElementById(`${key}`);
+      textArea.value += letter.querySelector(
+        `.${this.lang} span:not([hidden])`
+      ).innerHTML;
+    }
   }
 
   getCaretPosition(textAreaElement) {
@@ -216,14 +275,19 @@ class Keyboard {
   }
 
   handleMouseDown(event) {
-    console.log("this", this);
+    if (
+      !event.target.classList.contains("key") &&
+      event.target.parentElement.className !== "en" &&
+      event.target.parentElement.className !== "ru"
+    ) {
+      return;
+    }
     const ativeKeyElement =
       event.target.nodeName === "DIV"
-        ? event.target.querySelector("span span:not([hidden])")
+        ? event.target.querySelector(`.${this.lang} span:not([hidden])`)
         : event.target;
 
     const key = ativeKeyElement.closest("div");
-    console.log("key", key);
 
     const textArea = document.getElementById("keyboard-screen");
     if (key.id === "Backspace") {
@@ -234,6 +298,7 @@ class Keyboard {
         textArea.value.substr(0, position - 1) +
         textArea.value.substr(position);
       textArea.selectionStart = position - 1;
+      textArea.selectionEnd = position - 1;
       textArea.focus();
       return;
     }
@@ -247,12 +312,27 @@ class Keyboard {
         textArea.value.substr(0, position) +
         textArea.value.substr(position + 1);
       textArea.selectionStart = position;
+      textArea.selectionEnd = position;
       textArea.focus();
       return;
     }
 
+    if (key.id === "Enter") {
+      const position = this.getCaretPosition(textArea);
+      event.preventDefault();
+      textArea.value = `${textArea.value.substring(
+        0,
+        textArea.selectionStart
+      )}\r\n${textArea.value.substring(
+        textArea.selectionEnd,
+        textArea.value.length
+      )}`;
+      textArea.selectionEnd = position + 1;
+      return;
+    }
+
     if (key.id === "ShiftLeft" || key.id === "ShiftRight") {
-      keyboardButton.pressShiftDown();
+      keyboardButton.pressShiftDown(this.isCapsLockPressed);
       this.isShiftPressed = true;
       return;
     }
@@ -270,9 +350,8 @@ class Keyboard {
 
     const key = ativeKeyElement.closest("div");
     if (key.id === "ShiftLeft" || key.id === "ShiftRight") {
-      keyboardButton.keyShiftUp();
+      keyboardButton.keyShiftUp(this.isCapsLockPressed);
       this.isShiftPressed = false;
-      // return;
     }
   }
 }
