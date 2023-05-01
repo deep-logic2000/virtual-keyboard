@@ -39,7 +39,11 @@ class Button {
     return this.buttonWrapper;
   }
 
-  changeColor(event) {
+  changeColor(event, isCapsLockPressed) {
+    if (event.code === "CapsLock" && isCapsLockPressed) {
+      this.removeColor(event);
+      return;
+    }
     this.pressedKey = document.getElementById(`${event.code}`);
     this.pressedKey.classList.add("active");
     this.pressedKey.style.backgroundColor = "rgb(88, 182, 88)";
@@ -49,6 +53,22 @@ class Button {
     this.pressedKey = document.getElementById(`${event.code}`);
     this.pressedKey.classList.remove("active");
     this.pressedKey.style.backgroundColor = "";
+  }
+
+  changeColorMouseEvent(key, isCapsLockPressed) {
+    if (key.id === "CapsLock" && isCapsLockPressed) {
+      this.removeColorMouseEvent(key);
+      return;
+    }
+    this.key = key;
+    this.key.classList.add("active");
+    this.key.style.backgroundColor = "rgb(88, 182, 88)";
+  }
+
+  removeColorMouseEvent(key) {
+    this.key = key;
+    this.key.classList.remove("active");
+    this.key.style.backgroundColor = "";
   }
 
   pressShiftDown(isCapsLockPressed) {

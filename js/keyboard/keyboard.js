@@ -4,11 +4,9 @@ import {
   THIRD_ROW,
   FOURTH_ROW,
   FIFTH_ROW,
-  keysNotCapsLockedEn,
-  keysNotCapsLockedRu,
 } from "../constants.js";
 import { Button, keyboardButton } from "../button/button.js";
-import { setLocalStorage, getLocalStorage } from "../localStorage.js";
+import { setLocalStorage } from "../localStorage.js";
 
 class Keyboard {
   constructor() {
@@ -57,7 +55,7 @@ class Keyboard {
     textArea.setAttribute("id", "keyboard-screen");
     textArea.setAttribute("name", "keyboard-screen");
     textArea.setAttribute("rows", "10");
-    textArea.setAttribute("cols", "50");
+    textArea.setAttribute("cols", "85");
     textArea.setAttribute("autofocus", "true");
     textArea.classList.add("text");
 
@@ -79,16 +77,23 @@ class Keyboard {
     keyboardWrapper.append(this.fourthRow);
     keyboardWrapper.append(this.fifthRow);
 
+    container.append(keyboardWrapper);
+    container.insertAdjacentHTML(
+      "beforeend",
+      `<div class="footer__wrapper">
+    <p>Клавиатура создана в операционной системе Windows</p>
+    <p>Для переключения языка комбинация: левые ctrl + alt</p>
+    </div>
+    `
+    );
+    section.append(container);
+    this.wrapper.append(section);
     keyboardWrapper.addEventListener(
       "mousedown",
       this.handleMouseDown.bind(this)
     );
 
     keyboardWrapper.addEventListener("mouseup", this.handleMouseUp.bind(this));
-
-    container.append(keyboardWrapper);
-    section.append(container);
-    this.wrapper.append(section);
     document.addEventListener("keydown", this.handleKeyDown.bind(this));
     document.addEventListener("keyup", this.handleKeyUp.bind(this));
   }
@@ -107,10 +112,6 @@ class Keyboard {
     if (key === "ControlLeft") {
       this.isControlPressed = false;
     }
-    // if (event.code === "CapsLock") {
-    //   this.isCapsLockPressed = false;
-    //   keyboardButton.removeColor(event);
-    // }
     keyboardButton.removeColor(event);
   }
 
@@ -140,9 +141,25 @@ class Keyboard {
 
   handleKeyDown(event) {
     const textArea = document.getElementById("keyboard-screen");
-    keyboardButton.changeColor(event);
-    event.preventDefault();
     const key = event.code;
+    if (key !== "CapsLock") {
+      keyboardButton.changeColor(event, this.isCapsLockPressed);
+    }
+    event.preventDefault();
+
+    const letter = document.getElementById(`${key}`);
+
+    let symbolToRender;
+    if (key === "Tab") {
+      symbolToRender = "    ";
+    } else if (key === "Space") {
+      symbolToRender = " ";
+    } else {
+      symbolToRender = letter.querySelector(
+        `.${this.lang} span:not([hidden])`
+      ).innerText;
+    }
+
     if (key === "ShiftLeft" || key === "ShiftRight") {
       keyboardButton.pressShiftDown(this.isCapsLockPressed);
       this.isShiftPressed = true;
@@ -162,11 +179,11 @@ class Keyboard {
       return;
     }
 
-    if (key === "Tab") {
-      event.preventDefault();
-      textArea.value += "    ";
-      return;
-    }
+    // if (key === "Tab") {
+    //   event.preventDefault();
+    //   textArea.value += "    ";
+    //   return;
+    // }
 
     if (key === "Delete") {
       const position = this.getCaretPosition(textArea);
@@ -178,10 +195,6 @@ class Keyboard {
       textArea.focus();
       return;
     }
-
-    // if (key !== "CapsLock") {
-    //   keyboardButton.changeColor(event);
-    // }
 
     if (key === "Enter") {
       const position = this.getCaretPosition(textArea);
@@ -213,64 +226,46 @@ class Keyboard {
       this.changeLanguage();
       return;
     }
-    // console.log(key);
 
     if (key === "CapsLock") {
+      const isCapsRepeating = event.repeat;
+      if (isCapsRepeating) return;
+      keyboardButton.changeColor(event, this.isCapsLockPressed);
       keyboardButton.pressCapsLockDown(
         this.isCapsLockPressed,
-        this.isShiftPressed,
+        this.isShiftPressed
       );
       this.isCapsLockPressed = !this.isCapsLockPressed;
       return;
     }
 
-    // if (key === "CapsLock" && !event.repeat) {
-    //   const lowerCaseLetters = Array.from(
-    //     document.querySelectorAll(".caseDown"),
-    //   ).filter((el) => (this.lang === "en"
-    //     ? !keysNotCapsLockedEn.includes(el.parentElement.parentElement.id)
-    //     : !keysNotCapsLockedRu.includes(el.parentElement.parentElement.id)));
-    //   const upperCaseLetters = Array.from(
-    //     document.querySelectorAll(".caseUp"),
-    //   ).filter((el) => (this.lang === "en"
-    //     ? !keysNotCapsLockedEn.includes(el.parentElement.parentElement.id)
-    //     : !keysNotCapsLockedRu.includes(el.parentElement.parentElement.id)));
-    //   // console.log("document.querySelectorAll('.caseDown')", document.querySelectorAll(".caseDown"));
-    //   // console.log("lowerCaseButtons", lowerCaseButtons);
-    //   // const upperCaseButtons = document.querySelectorAll(".caseUp");
-    //   if (!this.isCapsLockPressed) {
-    //     keyboardButton.changeColor(event);
-    //     this.isCapsLockPressed = true;
-    //     lowerCaseLetters.forEach((elem) => elem.setAttribute("hidden", "true"));
-    //     upperCaseLetters.forEach((elem) => elem.removeAttribute("hidden"));
-    //   } else {
-    //     this.isCapsLockPressed = false;
-    //     keyboardButton.removeColor(event);
-    //     lowerCaseLetters.forEach((elem) => elem.removeAttribute("hidden"));
-    //     upperCaseLetters.forEach((elem) => elem.setAttribute("hidden", "true"));
-    //   }
-    // }
+    if (key === "ControlRight" || key === "AltRight") {
+      return;
+    }
+
     if (key !== "ControlLeft" && key !== "AltLeft") {
-      const letter = document.getElementById(`${key}`);
-      textArea.value += letter.querySelector(
-        `.${this.lang} span:not([hidden])`
-      ).innerHTML;
+      // const letter = document.getElementById(`${key}`);
+
+      const positionOfCaret = this.getCaretPosition(textArea);
+      // const symbolToRender = letter.querySelector(
+      //   `.${this.lang} span:not([hidden])`
+      // ).innerText;
+      if (positionOfCaret === textArea.value.length) {
+        textArea.value += symbolToRender;
+      } else {
+        textArea.value =
+          textArea.value.substr(0, positionOfCaret) +
+          symbolToRender +
+          textArea.value.substr(positionOfCaret);
+        textArea.selectionStart = positionOfCaret + symbolToRender.length;
+        textArea.selectionEnd = positionOfCaret + symbolToRender.length;
+      }
     }
   }
 
   getCaretPosition(textAreaElement) {
-    this.caretPos = 0;
-    if (document.selection) {
-      textAreaElement.focus();
-      const selection = document.selection.createRange();
-      selection.moveStart("character", -textAreaElement.value.length);
-      this.caretPos = selection.text.length;
-    } else if (
-      textAreaElement.selectionStart ||
-      textAreaElement.selectionStart === "0"
-    ) {
-      this.caretPos = textAreaElement.selectionStart;
-    }
+    textAreaElement.focus();
+    this.caretPos = textAreaElement.selectionStart;
     return this.caretPos;
   }
 
@@ -286,40 +281,55 @@ class Keyboard {
       event.target.nodeName === "DIV"
         ? event.target.querySelector(`.${this.lang} span:not([hidden])`)
         : event.target;
-
     const key = ativeKeyElement.closest("div");
+    let symbolToRender;
+    if (key.id === "Tab") {
+      symbolToRender = "    ";
+    } else if (key.id === "Space") {
+      symbolToRender = " ";
+    } else {
+      symbolToRender = ativeKeyElement.innerText;
+    }
 
     const textArea = document.getElementById("keyboard-screen");
+    const positionOfCaret = this.getCaretPosition(textArea);
     if (key.id === "Backspace") {
-      const position = this.getCaretPosition(textArea);
-      if (position < 1) return;
+      if (positionOfCaret < 1) return;
 
       textArea.value =
-        textArea.value.substr(0, position - 1) +
-        textArea.value.substr(position);
-      textArea.selectionStart = position - 1;
-      textArea.selectionEnd = position - 1;
+        textArea.value.substr(0, positionOfCaret - 1) +
+        textArea.value.substr(positionOfCaret);
+      textArea.selectionStart = positionOfCaret - 1;
+      textArea.selectionEnd = positionOfCaret - 1;
       textArea.focus();
       return;
     }
-    if (key.id === "Tab") {
-      textArea.value += "    ";
-      return;
-    }
+
     if (key.id === "Delete") {
-      const position = this.getCaretPosition(textArea);
       textArea.value =
-        textArea.value.substr(0, position) +
-        textArea.value.substr(position + 1);
-      textArea.selectionStart = position;
-      textArea.selectionEnd = position;
+        textArea.value.substr(0, positionOfCaret) +
+        textArea.value.substr(positionOfCaret + 1);
+      textArea.selectionStart = positionOfCaret;
+      textArea.selectionEnd = positionOfCaret;
       textArea.focus();
+      return;
+    }
+
+    if (key.id === "CapsLock") {
+      if (event.repeat) return;
+      keyboardButton.pressCapsLockDown(
+        this.isCapsLockPressed,
+        this.isShiftPressed
+      );
+      keyboardButton.changeColorMouseEvent(key, this.isCapsLockPressed);
+      this.isCapsLockPressed = !this.isCapsLockPressed;
       return;
     }
 
     if (key.id === "Enter") {
-      const position = this.getCaretPosition(textArea);
+      // const position = this.getCaretPosition(textArea);
       event.preventDefault();
+      console.log("caret position 1", positionOfCaret);
       textArea.value = `${textArea.value.substring(
         0,
         textArea.selectionStart
@@ -327,19 +337,44 @@ class Keyboard {
         textArea.selectionEnd,
         textArea.value.length
       )}`;
-      textArea.selectionEnd = position + 1;
+      // textArea.selectionStart = position + 1;
+      textArea.selectionEnd = positionOfCaret + 1;
+      console.log("caret position 2", positionOfCaret);
       return;
     }
 
     if (key.id === "ShiftLeft" || key.id === "ShiftRight") {
       keyboardButton.pressShiftDown(this.isCapsLockPressed);
+      keyboardButton.changeColorMouseEvent(key, this.isCapsLockPressed);
       this.isShiftPressed = true;
       return;
     }
 
-    textArea.value += ativeKeyElement.innerHTML;
-    // console.log("textArea.focus()");
+    if (
+      key.id === "ControlLeft" ||
+      key.id === "AltLeft" ||
+      key.id === "ControlRight" ||
+      key.id === "AltRight"
+    ) {
+      return;
+    }
+
+    console.log("caret position before print", positionOfCaret);
+    if (positionOfCaret === textArea.value.length) {
+      textArea.value += symbolToRender;
+      // textArea.focus();
+    } else {
+      textArea.value =
+        textArea.value.substr(0, positionOfCaret) +
+        symbolToRender +
+        textArea.value.substr(positionOfCaret);
+      textArea.selectionStart = positionOfCaret + symbolToRender.length;
+      textArea.selectionEnd = positionOfCaret + symbolToRender.length;
+      // textArea.focus();
+    }
+
     textArea.focus();
+    // textArea.blur();
   }
 
   handleMouseUp(event) {
@@ -351,6 +386,7 @@ class Keyboard {
     const key = ativeKeyElement.closest("div");
     if (key.id === "ShiftLeft" || key.id === "ShiftRight") {
       keyboardButton.keyShiftUp(this.isCapsLockPressed);
+      keyboardButton.removeColorMouseEvent(key);
       this.isShiftPressed = false;
     }
   }
