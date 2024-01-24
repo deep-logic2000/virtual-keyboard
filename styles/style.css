@@ -1,0 +1,109 @@
+body {
+  background: linear-gradient(rgb(229, 229, 255), rgb(255, 224, 229));
+  background-repeat: no-repeat;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 2rem;
+  color: rgb(45, 43, 80);
+  margin: 10px 0;
+}
+
+.text {
+  font-size: 18px;
+  line-height: 1.15;
+  color: rgb(75, 73, 73);
+  font-family: "Trebuchet MS", "Helvetica", sans-serif;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.text:focus {
+  border: 1px solid rgb(26, 26, 26);
+  outline: none;
+  outline-offset: none;
+}
+
+.keyboard {
+  font-size: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px 0px;
+  background: #424242;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  border: 0.063em solid #585858;
+  margin: 0 auto;
+  width: 55%;
+  box-sizing: border-box;
+  user-select: none;
+  min-width: 742px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0px 8px;
+}
+
+.key {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #333;
+  color: #eee;
+  border-radius: 0.3em;
+  min-width: 40px;
+  min-height: 40px;
+  box-shadow: 0 0.2em 0 0.05em #222;
+  border: 0.063em solid #444;
+  border-bottom-color: #555;
+  font-family: monospace;
+  font-size: 14px;
+  transition: box-shadow 0.4s ease, background-color 0.4s ease,
+    border-radius 0.4s ease;
+}
+
+.key:hover {
+  cursor: pointer;
+  background-color: rgb(58, 85, 58);
+}
+
+.key:active {
+  background-color: rgb(88, 182, 88);
+  border-radius: 15px;
+}
+
+.active {
+  background-color: rgb(88, 182, 88);
+  border-radius: 15px;
+}
+
+.key-l {
+  width: 100px;
+}
+
+.key-m {
+  width: 86px;
+}
+
+.key-tab {
+  width: 50px;
+}
+
+#Space {
+  width: 330px;
+  flex-grow: 1;
+}
+
+.footer__wrapper {
+  font-family: "Trebuchet MS", "Helvetica", sans-serif;
+}
